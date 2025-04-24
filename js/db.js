@@ -1,5 +1,5 @@
 const DB_NAME = 'FinanceApp';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // forçar atualização do banco
 let db;
 
 export function openDB() {
@@ -15,7 +15,17 @@ export function openDB() {
     request.onupgradeneeded = (event) => {
       db = event.target.result;
 
-      const stores = ['users', 'salary', 'expenses', 'categories', 'reminders', 'reports', 'goals'];
+      const stores = [
+        'users',
+        'salary',
+        'expenses',
+        'categories',
+        'reminders',
+        'reports',
+        'goals',
+        'logs' // ✅ agora incluída corretamente
+      ];
+
       stores.forEach(storeName => {
         if (!db.objectStoreNames.contains(storeName)) {
           const store = db.createObjectStore(storeName, { keyPath: 'id', autoIncrement: true });
@@ -39,6 +49,7 @@ export function addRecord(storeName, data) {
     request.onerror = () => reject('Erro ao adicionar registro');
   });
 }
+
 export function logAction(type, action, text) {
   const timestamp = new Date().toISOString();
   const tx = db.transaction('logs', 'readwrite');
